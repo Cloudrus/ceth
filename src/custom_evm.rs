@@ -15,6 +15,7 @@ use reth_evm::revm::primitives::{hardfork::SpecId, Address, Bytes};
 use reth_ethereum::EthPrimitives;
 use reth_ethereum::chainspec::ChainSpec;
 use std::sync::OnceLock;
+use alloy_primitives::keccak256;
 
 #[derive(Debug, Clone, Default, Copy)]
 pub struct MyEvmFactory;
@@ -81,10 +82,20 @@ pub fn custom_precompiles() -> &'static Precompiles {
         let addr = Address::from_slice(&addr_bytes);
 
         // 预编译实现：TestRead.read() 返回 uint256(100) 的 ABI 编码（32 字节，末位为 100）
-        let pc: PrecompileFn = |_, _| -> PrecompileResult {
-            let mut out = vec![0u8; 32];
-            out[31] = 100;
-            PrecompileResult::Ok(PrecompileOutput::new(0, Bytes::from(out)))
+        let pc: PrecompileFn = |data: &[u8], _gas: u64| -> PrecompileResult {
+            static READ_SELECTOR: OnceLock<[u8; 4]> = OnceLock::new();
+            let sel = *READ_SELECTOR.get_or_init(|| {
+                let h = keccak256("read()");
+                let mut s = [0u8; 4];
+                s.copy_from_slice(&h.as_slice()[0..4]);
+                s
+            });
+            if data.len() >= 4 && data[0..4] == sel {
+                let mut out = vec![0u8; 32];
+                out[31] = 100;
+                return PrecompileResult::Ok(PrecompileOutput::new(0, Bytes::from(out)));
+            }
+            PrecompileResult::Ok(PrecompileOutput::new(0, Bytes::new()))
         };
 
         precompiles.extend([(addr, pc).into()]);
