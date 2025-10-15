@@ -1,0 +1,20 @@
+[package]
+name = "ceth"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+# Ethereum meta crate
+reth = { git = "https://github.com/paradigmxyz/reth", tag = "v1.6.0" }
+reth-ethereum = { git = "https://github.com/paradigmxyz/reth", features = ["node-api", "node"], tag = "v1.6.0" }
+reth-node-builder = { git = "https://github.com/paradigmxyz/reth", tag = "v1.6.0", features = ["test-utils"] }
+reth-node-core = { git = "https://github.com/paradigmxyz/reth", tag = "v1.6.0" }
+reth-tasks = { git = "https://github.com/paradigmxyz/reth", tag = "v1.6.0" }
+reth-config = { git = "https://github.com/paradigmxyz/reth", tag = "v1.6.0" }
+reth-chainspec = { git = "https://github.com/paradigmxyz/reth.git", tag = "v1.6.0" }
+tokio = { version = "1.38.0", features = ["full"] }
+eyre = "0.6"
+reth-tracing = { git = "https://github.com/paradigmxyz/reth", tag = "v1.6.0" }
+alloy-primitives = "1.4"
+alloy-genesis = "1.0.38"
+reth-evm = { git = "https://github.com/paradigmxyz/reth", tag = "v1.6.0" }
